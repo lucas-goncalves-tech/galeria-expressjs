@@ -4,7 +4,9 @@ import { runMigrations } from 'database/migrate';
 import { db } from 'database/connection';
 
 runMigrations();
-configDotenv();
+configDotenv({
+  path: process.env.NODE_ENV === 'production' ? '.env' : '.env.local',
+});
 const PORT = process.env.PORT || 3333;
 
 const server = app.listen(PORT, () => {
