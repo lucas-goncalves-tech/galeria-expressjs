@@ -7,6 +7,7 @@ export function errorHandler(
   res: Response,
   next: NextFunction,
 ) {
+  console.error(err);
   if (err instanceof BaseError) {
     return res.status(err.statusCode).json({
       error: {
@@ -15,8 +16,6 @@ export function errorHandler(
       },
     });
   }
-
-  console.error(err);
 
   return res.status(500).json({
     error: {

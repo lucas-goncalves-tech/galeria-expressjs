@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS albums (
+    id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT,
+    user_id TEXT NOT NULL,
+    is_public INTEGER DEFAULT 0 NOT NULL CHECK (is_public IN (0, 1)),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) STRICT;
