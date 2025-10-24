@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { BaseError } from 'shared/erros/base.error';
+import { ValidationError } from 'shared/erros/validation.error';
 
 export function errorHandler(
   err: any,
@@ -10,17 +11,14 @@ export function errorHandler(
   console.error(err);
   if (err instanceof BaseError) {
     return res.status(err.statusCode).json({
-      error: {
-        message: err.message,
-        statusCode: err.statusCode,
-      },
+      message: err.message,
+      statusCode: err.statusCode,
+      details: err.details,
     });
   }
 
   return res.status(500).json({
-    error: {
-      message: 'Internal Server Error',
-      statusCode: 500,
-    },
+    message: 'Erro interno no servidor',
+    statusCode: 500,
   });
 }

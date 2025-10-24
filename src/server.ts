@@ -1,12 +1,10 @@
+import 'shared/config/env.config';
 import app from 'app';
-import { configDotenv } from 'dotenv';
 import { runMigrations } from 'database/migrate';
 import { db } from 'database/connection';
 
 runMigrations();
-configDotenv({
-  path: process.env.NODE_ENV === 'production' ? '.env' : '.env.local',
-});
+
 const PORT = process.env.PORT || 3333;
 
 const server = app.listen(PORT, () => {

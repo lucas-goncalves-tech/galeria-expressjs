@@ -1,7 +1,11 @@
 import { db } from 'database/connection';
 import { CreateUserDTO } from './dtos/create-user.dto';
-import { UserDTO, userSchema } from './dtos/user.dto';
-import { InternalError } from 'shared/erros/internal.error';
+import {
+  UserDTO,
+  userSchema,
+  UserWithHashDto,
+  userWithHashSchema,
+} from './dtos/user.dto';
 
 export class UserRepository {
   async findById(id: string): Promise<UserDTO | null> {
@@ -23,7 +27,7 @@ export class UserRepository {
     }
   }
 
-  async findByEmail(email: string): Promise<UserDTO | null> {
+  async findByEmail(email: string): Promise<UserWithHashDto | null> {
     const sql = `
       SELECT * FROM users
       WHERE email = ?
@@ -31,7 +35,7 @@ export class UserRepository {
     try {
       const stmt = db.prepare(sql);
       const user = stmt.get(email);
-      const safeUser = userSchema.safeParse(user);
+      const safeUser = userWithHashSchema.safeParse(user);
       if (!safeUser.success) {
         return null;
       } else {
@@ -56,17 +60,15 @@ export class UserRepository {
     ];
 
     try {
-      db.exec('BEGIN TRANSACTION;');
       const stmt = db.prepare(sql);
       stmt.run(params);
-      const safeNewUser = userSchema.safeParse(await this.findById(ID));
+      const user = await this.findById(ID);
+      const safeNewUser = userSchema.safeParse(user);
       if (!safeNewUser.success) {
-        throw new InternalError();
+        throw new Error('Error de dados ao criar novo usuário');
       }
-      db.exec('COMMIT');
       return safeNewUser.data;
     } catch (error) {
-      db.exec('ROLLBACK');
       throw error;
     }
   }
