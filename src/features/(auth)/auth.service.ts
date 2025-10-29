@@ -7,6 +7,7 @@ import { TokensDTO } from './dtos/tokens.dto';
 import { UnauthorizedError } from 'shared/erros/unauthorized.error';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { UserDTO } from 'features/(user)/dtos/user.dto';
 
 export class AuthService {
   private readonly SALT_ROUNDS = Number(process.env.SALT_ROUNDS);
@@ -15,7 +16,7 @@ export class AuthService {
   private readonly REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
   private readonly REFRESH_TOKEN_EXPIRES_IN =
     process.env.REFRESH_TOKEN_EXPIRES_IN;
-  constructor(private readonly userRepository = new UserRepository()) {
+  constructor(private readonly userRepository: UserRepository) {
     if (!this.SALT_ROUNDS || isNaN(this.SALT_ROUNDS)) {
       throw new Error('SALT_ROUNDS não está definido ou é inválido');
     }
@@ -33,7 +34,7 @@ export class AuthService {
     }
   }
 
-  async register(credentials: RegisterDTO): Promise<void> {
+  async register(credentials: RegisterDTO): Promise<UserDTO> {
     const userExists = await this.userRepository.findByEmail(credentials.email);
     if (userExists) {
       throw new ConflictError('Email já cadastrado');
@@ -44,11 +45,11 @@ export class AuthService {
       this.SALT_ROUNDS,
     );
     const newUser: CreateUserDTO = {
-      username: credentials.username,
+      name: credentials.username,
       email: credentials.email,
       password_hash: hashedPassword,
     };
-    await this.userRepository.create(newUser);
+    return await this.userRepository.create(newUser);
   }
 
   async login(credentials: LoginDTO): Promise<TokensDTO> {
@@ -69,7 +70,7 @@ export class AuthService {
     });
 
     const refresh_token = jwt.sign(
-      { sub: userExists.id, jti: crypto.randomUUID() },
+      { sub: userExists.id, role: userExists.role },
       this.REFRESH_TOKEN_SECRET!,
       {
         expiresIn: this

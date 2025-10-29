@@ -23,6 +23,7 @@ export class UserRepository {
         return safeUser.data;
       }
     } catch (error) {
+      console.error('Error ao buscar usuário por ID:', error);
       throw error;
     }
   }
@@ -42,6 +43,7 @@ export class UserRepository {
         return safeUser.data;
       }
     } catch (error) {
+      console.error('Error ao buscar usuário por email:', error);
       throw error;
     }
   }
@@ -49,15 +51,10 @@ export class UserRepository {
   async create(userData: CreateUserDTO): Promise<UserDTO> {
     const ID = crypto.randomUUID();
     const sql = `
-      INSERT INTO users (id, username, email, password_hash)
+      INSERT INTO users (id, name, email, password_hash)
       VALUES (?, ?, ?, ?)
     `;
-    const params = [
-      ID,
-      userData.username,
-      userData.email,
-      userData.password_hash,
-    ];
+    const params = [ID, userData.name, userData.email, userData.password_hash];
 
     try {
       const stmt = db.prepare(sql);
@@ -69,6 +66,7 @@ export class UserRepository {
       }
       return safeNewUser.data;
     } catch (error) {
+      console.error('Error ao criar novo usuário:', error);
       throw error;
     }
   }

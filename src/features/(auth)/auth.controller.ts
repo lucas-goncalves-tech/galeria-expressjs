@@ -4,7 +4,7 @@ import { RegisterDTO } from './dtos/register.dto';
 import { LoginDTO } from './dtos/login.dto';
 
 export class AuthController {
-  constructor(private readonly authService = new AuthService()) {}
+  constructor(private readonly authService: AuthService) {}
 
   register = async (req: Request, res: Response) => {
     const credentials: RegisterDTO = req.body;
@@ -31,7 +31,6 @@ export class AuthController {
   };
 
   me = async (req: Request, res: Response) => {
-    console.log(req.user);
     const userId = req.user?.sub!;
     const user = await this.authService.me(userId);
     res.status(200).json(user);

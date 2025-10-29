@@ -21,3 +21,8 @@ yarn-error.log*
 # databse files
 *.sqlite
 *.sql
+database.sqlite-shm
+database.sqlite-wal
+
+# Tests
+audit_auth.sh

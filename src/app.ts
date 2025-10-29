@@ -3,13 +3,42 @@ import cors from 'cors';
 import helmet from 'helmet';
 import { errorHandler } from 'shared/middlewares/error.middleware';
 import router from 'routes';
-const app = express();
+import { runMigrations } from 'database/migrate';
 
-app.use(json());
-app.use(cors());
-app.use(helmet());
+class App {
+  public server: express.Application;
 
-app.use('/api/v1', router);
-app.use(errorHandler);
+  constructor() {
+    this.server = express();
 
-export default app;
+    this.runDbMigrations();
+    this.middlewares();
+    this.routes();
+    this.handleErrors();
+  }
+
+  private runDbMigrations() {
+    try {
+      runMigrations();
+    } catch (error) {
+      console.error('Failed to run database migrations:', error);
+      process.exit(1);
+    }
+  }
+
+  private middlewares() {
+    this.server.use(helmet());
+    this.server.use(cors());
+    this.server.use(json());
+  }
+
+  private routes() {
+    this.server.use('/api/v1/', router);
+  }
+
+  private handleErrors() {
+    this.server.use(errorHandler);
+  }
+}
+
+export default new App().server;

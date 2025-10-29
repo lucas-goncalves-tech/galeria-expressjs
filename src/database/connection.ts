@@ -12,5 +12,6 @@ const DB_PATH = path.resolve(process.cwd(), DB_URL);
 
 const db = new Database(DB_PATH);
 db.pragma('foreign_keys = ON');
+db.pragma('journal_mode = WAL');
 
 export { db };
