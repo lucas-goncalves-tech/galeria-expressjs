@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS albums (
     title TEXT NOT NULL,
     description TEXT,
     user_id TEXT NOT NULL,
-    visibility INTEGER DEFAULT "PUBLIC" NOT NULL CHECK (visibility IN ("PUBLIC", "PRIVATE")),
+    visibility TEXT DEFAULT 'PRIVATE' NOT NULL CHECK (visibility IN ('PUBLIC', 'PRIVATE')),
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) STRICT;

@@ -1,19 +1,19 @@
 import { db } from 'database/connection';
 import { CreateAlbumDTO } from './dtos/create-album.dto';
-import { AlbumDTO, albumSchema, albumsSchema } from './dtos/album.dto';
+import { albumSchema, albumsSchema } from './dtos/album.dto';
 import { UpdateAlbumDTO } from './dtos/update-album.dto';
 
-export class ALbumRepository {
+export class AlbumRepository {
   constructor() {}
 
-  async findById(id: string): Promise<AlbumDTO | null> {
+  async findById(albumId: string) {
     const sql = `
       SELECT * FROM albums
       WHERE id = ?
     `;
     try {
       const stmt = db.prepare(sql);
-      const album = stmt.get(id);
+      const album = stmt.get(albumId);
       const safeAlbum = albumSchema.safeParse(album);
       if (!safeAlbum.success) {
         return null;
@@ -26,7 +26,7 @@ export class ALbumRepository {
     }
   }
 
-  async findAll(userId: AlbumDTO['user_id']): Promise<AlbumDTO[]> {
+  async findAllByUserId(userId: string) {
     const sql = `
       SELECT * FROM albums WHERE user_id = ?
     `;
@@ -44,17 +44,18 @@ export class ALbumRepository {
     }
   }
 
-  async create(newAlbumData: CreateAlbumDTO): Promise<AlbumDTO> {
+  async create(newAlbumData: CreateAlbumDTO, userId: string) {
     const sqlCreate = `
-      INSERT INTO albums (id, name, description, visibility)
-      VALUES (?, ?, ?, ?)
+      INSERT INTO albums (id, title, description, visibility, user_id)
+      VALUES (?, ?, ?, ?, ?)
       RETURNING *
     `;
     const paramsCreate = [
       crypto.randomUUID(),
-      newAlbumData.name,
+      newAlbumData.title,
       newAlbumData.description || null,
-      newAlbumData.visibility || 'PRIVATE',
+      newAlbumData.visibility,
+      userId,
     ];
 
     try {
@@ -70,7 +71,7 @@ export class ALbumRepository {
     albumId: string,
     userId: string,
     updateAlbumData: UpdateAlbumDTO,
-  ): Promise<AlbumDTO> {
+  ) {
     const sets = Object.keys(updateAlbumData)
       .map((key) => `${key} = ?`)
       .join(', ');
@@ -87,6 +88,18 @@ export class ALbumRepository {
       return albumSchema.parse(stmtUpdate.get(paramsUpdate));
     } catch (error) {
       console.error('Error ao atualizar álbum:', error);
+      throw error;
+    }
+  }
+
+  async delete(albumId: string, userId: string) {
+    const sql = `DELETE FROM albums WHERE id = ? AND user_id = ?`;
+    try {
+      const stmt = db.prepare(sql);
+      const info = stmt.run(albumId, userId);
+      return info.changes > 0;
+    } catch (error) {
+      console.error('Error ao deletar álbum:', error);
       throw error;
     }
   }

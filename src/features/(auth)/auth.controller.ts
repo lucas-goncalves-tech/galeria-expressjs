@@ -9,9 +9,9 @@ export class AuthController {
   register = async (req: Request, res: Response) => {
     const credentials: RegisterDTO = req.body;
 
-    await this.authService.register(credentials);
+    const newUser = await this.authService.register(credentials);
 
-    res.status(201).end();
+    res.status(201).json(newUser);
   };
 
   login = async (req: Request, res: Response) => {
@@ -31,8 +31,8 @@ export class AuthController {
   };
 
   me = async (req: Request, res: Response) => {
-    const userId = req.user?.sub!;
-    const user = await this.authService.me(userId);
+    const { sub } = req.user!;
+    const user = await this.authService.me(sub);
     res.status(200).json(user);
   };
 }

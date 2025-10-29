@@ -65,12 +65,16 @@ export class AuthService {
       throw new UnauthorizedError('Email/senha inválidos');
     }
 
-    const access_token = jwt.sign({ sub: userExists.id }, this.JWT_SECRET!, {
-      expiresIn: this.JWT_EXPIRES_IN as jwt.SignOptions['expiresIn'],
-    });
+    const access_token = jwt.sign(
+      { sub: userExists.id, role: userExists.role },
+      this.JWT_SECRET!,
+      {
+        expiresIn: this.JWT_EXPIRES_IN as jwt.SignOptions['expiresIn'],
+      },
+    );
 
     const refresh_token = jwt.sign(
-      { sub: userExists.id, role: userExists.role },
+      { sub: userExists.id },
       this.REFRESH_TOKEN_SECRET!,
       {
         expiresIn: this

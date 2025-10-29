@@ -1,9 +1,6 @@
 import 'shared/config/env.config';
 import app from 'app';
-import { runMigrations } from 'database/migrate';
 import { db } from 'database/connection';
-
-runMigrations();
 
 const PORT = process.env.PORT || 3333;
 
@@ -18,6 +15,11 @@ const gracefulShutdown = (signal: string) => {
     console.log('Servidor finalizado com sucesso.');
     process.exit(0);
   });
+
+  setTimeout(() => {
+    console.error('❌ Desligamento forçado devido ao timeout');
+    process.exit(1);
+  }, 10000);
 };
 
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));

@@ -2,9 +2,15 @@ import { z } from 'zod';
 
 export const createAlbumSchema = z
   .object({
-    name: z.string().min(3, 'Nome do álbum deve ter no mínimo 3 caracteres.'),
-    description: z.string().optional(),
-    visibility: z.enum(['PUBLIC', 'PRIVATE']).default('PRIVATE').optional(),
+    title: z
+      .string()
+      .min(3, 'Titulo do álbum deve ter no mínimo 3 caracteres.')
+      .max(30, 'Titulo do álbum deve ter no máximo 30 caracteres.'),
+    description: z
+      .string()
+      .max(200, 'Descrição deve ter no máximo 200 caracteres.')
+      .optional(),
+    visibility: z.enum(['PUBLIC', 'PRIVATE']).default('PRIVATE'),
   })
   .strict();
 

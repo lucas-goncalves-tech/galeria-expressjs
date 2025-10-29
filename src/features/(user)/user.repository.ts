@@ -16,6 +16,7 @@ export class UserRepository {
     try {
       const stmt = db.prepare(sql);
       const user = stmt.get(id);
+      console.log('USer by id: ', user);
       const safeUser = userSchema.safeParse(user);
       if (!safeUser.success) {
         return null;
@@ -53,14 +54,14 @@ export class UserRepository {
     const sql = `
       INSERT INTO users (id, name, email, password_hash)
       VALUES (?, ?, ?, ?)
+      RETURNING *
     `;
     const params = [ID, userData.name, userData.email, userData.password_hash];
 
     try {
       const stmt = db.prepare(sql);
-      stmt.run(params);
-      const user = await this.findById(ID);
-      const safeNewUser = userSchema.safeParse(user);
+
+      const safeNewUser = userSchema.safeParse(stmt.get(params));
       if (!safeNewUser.success) {
         throw new Error('Error de dados ao criar novo usuário');
       }

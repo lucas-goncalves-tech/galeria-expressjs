@@ -3,12 +3,16 @@ import { z } from 'zod';
 // Na atualização, todos os campos são opcionais
 export const updateAlbumSchema = z
   .object({
-    name: z
+    title: z
       .string()
-      .min(3, 'Nome do álbum deve ter no mínimo 3 caracteres.')
+      .min(3, 'Titulo do álbum deve ter no mínimo 3 caracteres.')
+      .max(30, 'Titulo do álbum deve ter no máximo 30 caracteres.')
       .optional(),
-    description: z.string().optional().nullable(),
-    visibility: z.enum(['PUBLIC', 'PRIVATE']).optional(),
+    description: z
+      .string()
+      .max(200, 'Descrição deve ter no máximo 200 caracteres.')
+      .optional(),
+    visibility: z.enum(['PUBLIC', 'PRIVATE']).default('PRIVATE').optional(),
   })
   .refine((data) => {
     return Object.keys(data).length > 0;
