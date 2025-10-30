@@ -68,9 +68,9 @@ export class AlbumRepository {
   }
 
   async update(
+    updateAlbumData: UpdateAlbumDTO,
     albumId: string,
     userId: string,
-    updateAlbumData: UpdateAlbumDTO,
   ) {
     const sets = Object.keys(updateAlbumData)
       .map((key) => `${key} = ?`)

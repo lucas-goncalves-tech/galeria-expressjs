@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { AlbumService } from './album.service';
 import { CreateAlbumDTO } from './dtos/create-album.dto';
+import { UpdateAlbumDTO } from './dtos/update-album.dto';
 
 export class AlbumController {
   constructor(private readonly albumService: AlbumService) {}
@@ -29,5 +30,19 @@ export class AlbumController {
     const album = await this.albumService.findById(albumId, sub);
 
     res.status(200).json(album);
+  };
+
+  update = async (req: Request, res: Response) => {
+    const { sub } = req.user!;
+    const albumId = req.params.id;
+    const albumDataToUpdate = req.body as UpdateAlbumDTO;
+
+    const updatedAlbum = await this.albumService.update(
+      albumDataToUpdate,
+      albumId,
+      sub,
+    );
+
+    res.status(200).json(updatedAlbum);
   };
 }

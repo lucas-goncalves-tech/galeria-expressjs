@@ -9,6 +9,6 @@ export const albumSchema = z.object({
   created_at: z.string(),
 });
 
-export const albumsSchema = z.array(albumSchema.omit({ user_id: true }));
+export const albumsSchema = z.array(albumSchema);
 
 export type AlbumDTO = z.infer<typeof albumSchema>;
