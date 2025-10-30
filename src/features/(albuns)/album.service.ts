@@ -19,9 +19,7 @@ export class AlbumService {
     if (!album) {
       throw new NotFoundError('Album não encontrado!');
     }
-    console.log('album user ID: ', album.visibility !== 'PUBLIC');
-    console.log('user ID: ', album.user_id !== userId);
-    if (album.user_id !== userId && album.visibility !== 'PUBLIC') {
+    if (album.visibility !== 'PUBLIC' && album.user_id !== userId) {
       throw new ForbiddenError('Vocẽ não tem acesso a esse album!');
     }
     const { user_id, ...albumWithoutUserId } = album;

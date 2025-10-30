@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import { errorHandler } from 'shared/middlewares/error.middleware';
 import router from 'routes';
 import { runMigrations } from 'database/migrate';
+import { loggerMiddleware } from 'shared/middlewares/logger.middleware';
 
 class App {
   public server: express.Application;
@@ -30,6 +31,7 @@ class App {
     this.server.use(helmet());
     this.server.use(cors());
     this.server.use(json());
+    this.server.use(loggerMiddleware);
   }
 
   private routes() {
