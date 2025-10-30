@@ -45,4 +45,13 @@ export class AlbumController {
 
     res.status(200).json(updatedAlbum);
   };
+
+  delete = async (req: Request, res: Response) => {
+    const { sub } = req.user!;
+    const { id } = req.params;
+
+    await this.albumService.delete(id, sub);
+
+    res.status(204).end();
+  };
 }

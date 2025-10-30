@@ -6,8 +6,9 @@ import { authMiddleware } from 'shared/middlewares/auth.middleware';
 import { validate } from 'shared/middlewares/validate.middleware';
 import { createAlbumSchema } from './dtos/create-album.dto';
 import { updateAlbumSchema } from './dtos/update-album.dto';
+import { db } from 'database/connection';
 
-const albumService = new AlbumService(new AlbumRepository());
+const albumService = new AlbumService(new AlbumRepository(db));
 const albumController = new AlbumController(albumService);
 const albumRouter = Router();
 
@@ -26,5 +27,6 @@ albumRouter.put(
   validate({ body: updateAlbumSchema }),
   albumController.update,
 );
+albumRouter.delete('/:id', authMiddleware, albumController.delete);
 
 export default albumRouter;

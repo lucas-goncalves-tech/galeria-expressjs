@@ -48,4 +48,20 @@ export class AlbumService {
     );
     return safeAlbum;
   }
+
+  async delete(albumId: string, userId: string) {
+    const albumExist = await this.albumRepository.findById(albumId);
+    if (!albumExist) {
+      throw new NotFoundError('Album não encontrado!');
+    }
+
+    if (albumExist.user_id !== userId) {
+      throw new ForbiddenError('Você não tem acesso a esse album!');
+    }
+
+    const isAlbumDeleted = await this.albumRepository.delete(albumId, userId);
+    if (!isAlbumDeleted) {
+      throw new Error('Erro ao deletar album!');
+    }
+  }
 }
