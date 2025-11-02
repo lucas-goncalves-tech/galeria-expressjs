@@ -7,4 +7,4 @@ const multerInstance = multer({
   },
 });
 
-export const upload = multerInstance.single('image_file');
+export const uploadMiddleware = multerInstance.single('image_file');

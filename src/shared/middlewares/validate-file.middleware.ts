@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { fileTypeFromBuffer } from 'file-type';
 import { ValidationError } from 'shared/erros/validation.error';
 
-export async function validateFile(
+export async function validateFileMiddleware(
   req: Request,
   res: Response,
   next: NextFunction,
@@ -22,6 +22,7 @@ export async function validateFile(
 
     throw new ValidationError('Arquivo não enviado ou corromido!');
   } catch (error) {
+    console.error('Validação de tipo de arquivo falhou: ', error);
     throw error;
   }
 }

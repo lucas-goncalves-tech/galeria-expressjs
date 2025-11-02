@@ -92,6 +92,17 @@ export class AlbumRepository {
     }
   }
 
+  async updateCover(albumId: string, storageKey: string) {
+    const sql = `UPDATE "albums" SET cover_image_key = ? WHERE id = ?`;
+    try {
+      const stmt = this.db.prepare(sql);
+      stmt.run(storageKey, albumId);
+    } catch (error) {
+      console.error('Error ao atualizar album cover image: ', error);
+      throw error;
+    }
+  }
+
   async delete(albumId: string, userId: string) {
     const sql = `DELETE FROM albums WHERE id = ? AND user_id = ?`;
     try {

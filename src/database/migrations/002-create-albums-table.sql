@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS albums (
     id TEXT PRIMARY KEY,
+    cover_image_key TEXT DEFAULT NULL,
     title TEXT NOT NULL,
     description TEXT,
     user_id TEXT NOT NULL,

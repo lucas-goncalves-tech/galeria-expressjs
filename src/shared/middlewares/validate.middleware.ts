@@ -8,7 +8,7 @@ interface ISchemas {
   params?: z.ZodType;
 }
 
-export function validate(schema: ISchemas) {
+export function validateMiddleware(schema: ISchemas) {
   return async (req: Request, res: Response, next: NextFunction) => {
     const errors: { path: string; message: string }[] = [];
     try {
