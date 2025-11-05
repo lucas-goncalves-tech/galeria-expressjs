@@ -22,4 +22,24 @@ export class ImageRepository {
       throw error;
     }
   }
+
+  async findByStorageKey(storage_key: string) {
+    const sql = `SELECT * FROM images WHERE storage_key = ?`;
+
+    try {
+      const stmt = this.db.prepare(sql);
+
+      const safeImage = imageSchema.safeParse(stmt.get(storage_key));
+      if (!safeImage.success) {
+        return null;
+      }
+      return safeImage.data;
+    } catch (error) {
+      console.error(
+        'Não foi possivel encontrar image por storage key: ',
+        error,
+      );
+      throw error;
+    }
+  }
 }

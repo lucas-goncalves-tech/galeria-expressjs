@@ -29,3 +29,7 @@ database.sqlite-wal
 
 # Tests
 audit_auth.sh
+
+# some md
+GEMINI.md
+QWEN.md

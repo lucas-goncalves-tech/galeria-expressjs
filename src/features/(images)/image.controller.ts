@@ -17,4 +17,21 @@ export class ImageController {
 
     res.status(201).json(newImage);
   };
+
+  download = async (req: Request, res: Response) => {
+    const { id: storage_key } = req.params;
+    const { sub: userId } = req.user!;
+
+    const fileDetails = await this.imageService.getDownloadDetails(
+      storage_key,
+      userId,
+    );
+
+    res.setHeader('Content-Type', fileDetails.mime_type);
+    res.setHeader(
+      'Content-Disposition',
+      `inline; filename=${fileDetails.original_name}`,
+    );
+    res.sendFile(fileDetails.filePath);
+  };
 }

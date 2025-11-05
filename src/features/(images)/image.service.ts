@@ -47,4 +47,29 @@ export class ImageService {
 
     return newImage;
   }
+
+  async getDownloadDetails(storage_key: string, userId: string) {
+    const existImage = await this.imageRepository.findByStorageKey(storage_key);
+    if (!existImage) {
+      throw new NotFoundError('Imagem não encontrada!');
+    }
+    const existAlbum = await this.albumRepository.findById(existImage.album_id);
+    if (!existAlbum) {
+      throw new NotFoundError('Album não encontrado!');
+    }
+
+    if (existAlbum.visibility === 'PRIVATE' && existAlbum.user_id !== userId) {
+      throw new ForbiddenError('Voce não tem acesso a esse album!');
+    }
+
+    const filePath = this.storageProvider.getAbsolutePath(
+      existImage.storage_key,
+    );
+
+    return {
+      filePath,
+      mime_type: existImage.mime_type,
+      original_name: existImage.original_name,
+    };
+  }
 }

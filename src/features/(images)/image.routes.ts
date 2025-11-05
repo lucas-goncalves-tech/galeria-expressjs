@@ -28,4 +28,6 @@ imageRouter.post(
   imageController.upload,
 );
 
+imageRouter.get('/:id', authMiddleware, imageController.download);
+
 export default imageRouter;

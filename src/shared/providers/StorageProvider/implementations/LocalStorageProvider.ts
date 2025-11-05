@@ -28,4 +28,8 @@ export class LocalStorageProvider implements IStorageProvider {
     const filePath = path.resolve(this.storageDir, filename);
     await unlink(filePath);
   }
+
+  getAbsolutePath(storage_key: string) {
+    return path.resolve(this.storageDir, storage_key);
+  }
 }
