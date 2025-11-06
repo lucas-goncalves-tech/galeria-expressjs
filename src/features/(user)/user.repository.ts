@@ -11,13 +11,11 @@ export class UserRepository {
   async findById(id: string): Promise<UserDTO | null> {
     const sql = `
       SELECT * FROM users
-      WHERE id = ?
+      WHERE id = @id
     `;
     try {
-      const stmt = db.prepare(sql);
-      const user = stmt.get(id);
-      console.log('USer by id: ', user);
-      const safeUser = userSchema.safeParse(user);
+      const row = db.prepare(sql).get({ id });
+      const safeUser = userSchema.safeParse(row);
       if (!safeUser.success) {
         return null;
       } else {
@@ -32,12 +30,11 @@ export class UserRepository {
   async findByEmail(email: string): Promise<UserWithHashDto | null> {
     const sql = `
       SELECT * FROM users
-      WHERE email = ?
+      WHERE email = @email
     `;
     try {
-      const stmt = db.prepare(sql);
-      const user = stmt.get(email);
-      const safeUser = userWithHashSchema.safeParse(user);
+      const row = db.prepare(sql).get({ email });
+      const safeUser = userWithHashSchema.safeParse(row);
       if (!safeUser.success) {
         return null;
       } else {
@@ -50,18 +47,17 @@ export class UserRepository {
   }
 
   async create(userData: CreateUserDTO): Promise<UserDTO> {
-    const ID = crypto.randomUUID();
+    const id = crypto.randomUUID();
     const sql = `
       INSERT INTO users (id, name, email, password_hash)
-      VALUES (?, ?, ?, ?)
+      VALUES (@id, @name, @email, @password_hash)
       RETURNING *
     `;
-    const params = [ID, userData.name, userData.email, userData.password_hash];
 
     try {
-      const stmt = db.prepare(sql);
+      const row = db.prepare(sql).get({ id, ...userData });
 
-      const safeNewUser = userSchema.safeParse(stmt.get(params));
+      const safeNewUser = userSchema.safeParse(row);
       if (!safeNewUser.success) {
         throw new Error('Error de dados ao criar novo usuário');
       }

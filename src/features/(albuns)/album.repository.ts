@@ -9,17 +9,15 @@ export class AlbumRepository {
   async findById(albumId: string) {
     const sql = `
       SELECT * FROM albums
-      WHERE id = ?
+      WHERE id = @id
     `;
     try {
-      const stmt = this.db.prepare(sql);
-      const album = stmt.get(albumId);
-      const safeAlbum = albumSchema.safeParse(album);
+      const row = this.db.prepare(sql).get({ id: albumId });
+      const safeAlbum = albumSchema.safeParse(row);
       if (!safeAlbum.success) {
         return null;
-      } else {
-        return safeAlbum.data;
       }
+      return safeAlbum.data;
     } catch (error) {
       console.error('Error ao buscar álbum por ID:', error);
       throw error;
@@ -28,12 +26,11 @@ export class AlbumRepository {
 
   async findAllByUserId(userId: string) {
     const sql = `
-      SELECT * FROM albums WHERE user_id = ?
+      SELECT * FROM albums WHERE user_id = @user_id
     `;
     try {
-      const stmt = this.db.prepare(sql);
-      const albums = stmt.all(userId);
-      const safeAlbums = albumsSchema.safeParse(albums);
+      const rows = this.db.prepare(sql).all({ user_id: userId });
+      const safeAlbums = albumsSchema.safeParse(rows);
       if (!safeAlbums.success) {
         return [];
       }
@@ -45,22 +42,21 @@ export class AlbumRepository {
   }
 
   async create(newAlbumData: CreateAlbumDTO, userId: string) {
-    const sqlCreate = `
+    const sql = `
       INSERT INTO albums (id, title, description, visibility, user_id)
-      VALUES (?, ?, ?, ?, ?)
+      VALUES (@id, @title, @description, @visibility, @user_id)
       RETURNING *
     `;
-    const paramsCreate = [
-      crypto.randomUUID(),
-      newAlbumData.title,
-      newAlbumData.description || null,
-      newAlbumData.visibility,
-      userId,
-    ];
 
     try {
-      const stmtCreate = this.db.prepare(sqlCreate);
-      return albumSchema.parse(stmtCreate.get(paramsCreate));
+      const row = this.db.prepare(sql).get({
+        id: crypto.randomUUID(),
+        title: newAlbumData.title,
+        description: newAlbumData.description || null,
+        visibility: newAlbumData.visibility,
+        user_id: userId,
+      });
+      return albumSchema.parse(row);
     } catch (error) {
       console.error('Error ao criar álbum:', error);
       throw error;
@@ -76,16 +72,20 @@ export class AlbumRepository {
       .map((key) => `${key} = ?`)
       .join(', ');
     const values = Object.values(updateAlbumData);
-    const sqlUpdate = `
+    const sql = `
       UPDATE albums
       SET ${sets}
-      WHERE id = ? AND user_id = ?
+      WHERE id = @id AND user_id = @user_id
       RETURNING *
     `;
-    const paramsUpdate = [...values, albumId, userId];
+    console.log('values: ', values);
+    console.log('sets: ', sets);
     try {
-      const stmtUpdate = this.db.prepare(sqlUpdate);
-      return albumSchema.parse(stmtUpdate.get(paramsUpdate));
+      const row = this.db.prepare(sql).get(...values, {
+        id: albumId,
+        user_id: userId,
+      });
+      return albumSchema.parse(row);
     } catch (error) {
       console.error('Error ao atualizar álbum:', error);
       throw error;
@@ -93,10 +93,12 @@ export class AlbumRepository {
   }
 
   async updateCover(albumId: string, storageKey: string) {
-    const sql = `UPDATE "albums" SET cover_image_key = ? WHERE id = ?`;
+    const sql = `UPDATE "albums" SET cover_image_key = @cover_image_key WHERE id = @id`;
     try {
-      const stmt = this.db.prepare(sql);
-      stmt.run(storageKey, albumId);
+      this.db.prepare(sql).run({
+        cover_image_key: storageKey,
+        id: albumId,
+      });
     } catch (error) {
       console.error('Error ao atualizar album cover image: ', error);
       throw error;
@@ -104,10 +106,9 @@ export class AlbumRepository {
   }
 
   async delete(albumId: string, userId: string) {
-    const sql = `DELETE FROM albums WHERE id = ? AND user_id = ?`;
+    const sql = `DELETE FROM albums WHERE id = @id AND user_id = @user_id`;
     try {
-      const stmt = this.db.prepare(sql);
-      const info = stmt.run(albumId, userId);
+      const info = this.db.prepare(sql).run({ id: albumId, user_id: userId });
       return info.changes > 0;
     } catch (error) {
       console.error('Error ao deletar álbum:', error);

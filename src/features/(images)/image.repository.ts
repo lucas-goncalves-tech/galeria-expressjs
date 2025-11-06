@@ -8,15 +8,15 @@ export class ImageRepository {
   async create(imageData: IImageCreate) {
     const sql = `INSERT INTO "images" 
     (id, album_id, storage_key, original_name, mime_type, size)
-    VALUES ($id, $album_id, $storage_key, $original_name, $mime_type, $size)
+    VALUES (@id, @album_id, @storage_key, @original_name, @mime_type, @size)
     RETURNING *`;
     const newImage = {
       ...imageData,
       id: crypto.randomUUID(),
     };
     try {
-      const stmt = this.db.prepare(sql);
-      return imageSchema.parse(stmt.get(newImage));
+      const row = this.db.prepare(sql).get(newImage);
+      return imageSchema.parse(row);
     } catch (error) {
       console.error('Erro ao criar imagem no banco de dados: ', error);
       throw error;
@@ -24,12 +24,12 @@ export class ImageRepository {
   }
 
   async findByStorageKey(storage_key: string) {
-    const sql = `SELECT * FROM images WHERE storage_key = ?`;
+    const sql = `SELECT * FROM images WHERE storage_key = @storage_key`;
 
     try {
-      const stmt = this.db.prepare(sql);
+      const row = this.db.prepare(sql).get({ storage_key });
 
-      const safeImage = imageSchema.safeParse(stmt.get(storage_key));
+      const safeImage = imageSchema.safeParse(row);
       if (!safeImage.success) {
         return null;
       }

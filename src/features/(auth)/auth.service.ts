@@ -7,7 +7,6 @@ import { TokensDTO } from './dtos/tokens.dto';
 import { UnauthorizedError } from 'shared/erros/unauthorized.error';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { UserDTO } from 'features/(user)/dtos/user.dto';
 
 export class AuthService {
   private readonly SALT_ROUNDS = Number(process.env.SALT_ROUNDS);
@@ -34,7 +33,7 @@ export class AuthService {
     }
   }
 
-  async register(credentials: RegisterDTO): Promise<UserDTO> {
+  async register(credentials: RegisterDTO) {
     const userExists = await this.userRepository.findByEmail(credentials.email);
     if (userExists) {
       throw new ConflictError('Email já cadastrado');
@@ -49,10 +48,11 @@ export class AuthService {
       email: credentials.email,
       password_hash: hashedPassword,
     };
-    return await this.userRepository.create(newUser);
+    const { id, ...safeUser } = await this.userRepository.create(newUser);
+    return safeUser;
   }
 
-  async login(credentials: LoginDTO): Promise<TokensDTO> {
+  async login(credentials: LoginDTO) {
     const userExists = await this.userRepository.findByEmail(credentials.email);
     if (!userExists) {
       throw new UnauthorizedError('Email/senha inválidos');
