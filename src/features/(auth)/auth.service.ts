@@ -7,6 +7,7 @@ import { TokensDTO } from './dtos/tokens.dto';
 import { UnauthorizedError } from 'shared/erros/unauthorized.error';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { NotFoundError } from 'shared/erros/not-found.error';
 
 export class AuthService {
   private readonly SALT_ROUNDS = Number(process.env.SALT_ROUNDS);
@@ -86,6 +87,11 @@ export class AuthService {
   }
 
   async me(userId: string) {
-    return await this.userRepository.findById(userId);
+    const existUser = await this.userRepository.findById(userId);
+    if (!existUser) {
+      throw new NotFoundError('Usuário não encontrado');
+    }
+    const { id: _, ...safeUser } = existUser;
+    return safeUser;
   }
 }

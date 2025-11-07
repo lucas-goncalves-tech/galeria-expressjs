@@ -11,7 +11,7 @@ router.get('/health', (_req, res) => {
 
 router.use('/auth', authRouter);
 router.use('/album', albumRouter);
-router.use('/album', imageRouter);
+router.use(imageRouter);
 
 router.use((req, res) => {
   res.status(404).json({

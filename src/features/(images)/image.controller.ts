@@ -34,4 +34,13 @@ export class ImageController {
     );
     res.sendFile(fileDetails.filePath);
   };
+
+  delete = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { sub } = req.user!;
+
+    await this.imageService.delete(id, sub);
+
+    res.status(204).end();
+  };
 }

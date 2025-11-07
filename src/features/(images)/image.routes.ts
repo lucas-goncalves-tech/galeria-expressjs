@@ -16,18 +16,20 @@ const imageService = new ImageService(
   albumRepository,
   imageRepository,
   storageProvider,
+  db,
 );
 const imageController = new ImageController(imageService);
 const imageRouter = Router();
 
 imageRouter.post(
-  '/:id/images',
+  '/album/:id/image',
   authMiddleware,
   uploadMiddleware,
   validateFileMiddleware,
   imageController.upload,
 );
 
-imageRouter.get('/:id', authMiddleware, imageController.download);
+imageRouter.get('/image/:id', authMiddleware, imageController.download);
+imageRouter.delete('/image/:id', authMiddleware, imageController.delete);
 
 export default imageRouter;

@@ -78,8 +78,6 @@ export class AlbumRepository {
       WHERE id = @id AND user_id = @user_id
       RETURNING *
     `;
-    console.log('values: ', values);
-    console.log('sets: ', sets);
     try {
       const row = this.db.prepare(sql).get(...values, {
         id: albumId,
@@ -92,7 +90,7 @@ export class AlbumRepository {
     }
   }
 
-  async updateCover(albumId: string, storageKey: string) {
+  async updateCover(albumId: string, storageKey: string | null) {
     const sql = `UPDATE "albums" SET cover_image_key = @cover_image_key WHERE id = @id`;
     try {
       this.db.prepare(sql).run({

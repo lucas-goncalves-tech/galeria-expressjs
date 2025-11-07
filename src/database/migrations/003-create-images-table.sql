@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS images (
     id TEXT PRIMARY KEY,
     album_id TEXT NOT NULL,
     storage_key TEXT NOT NULL UNIQUE,
+    thumbnail_key TEXT,
     original_name TEXT NOT NULL,
     mime_type TEXT NOT NULL,
     size INTEGER NOT NULL,

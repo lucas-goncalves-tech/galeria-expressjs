@@ -12,7 +12,7 @@ export const updateAlbumSchema = z
       .string()
       .max(200, 'Descrição deve ter no máximo 200 caracteres.')
       .optional(),
-    visibility: z.enum(['PUBLIC', 'PRIVATE']).default('PRIVATE').optional(),
+    visibility: z.enum(['PUBLIC', 'PRIVATE']).optional(),
   })
   .refine((data) => {
     return Object.keys(data).length > 0;
