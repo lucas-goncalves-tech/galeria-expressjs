@@ -47,9 +47,9 @@ export class ImageRepository {
     const sql = `SELECT * FROM images WHERE album_id = @album_id`;
 
     try {
-      const row = this.db.prepare(sql).all({ album_id: albumId });
+      const rows = this.db.prepare(sql).all({ album_id: albumId });
 
-      const safeImage = imagesSchema.safeParse(row);
+      const safeImage = imagesSchema.safeParse(rows);
       if (!safeImage.success) {
         return [];
       }

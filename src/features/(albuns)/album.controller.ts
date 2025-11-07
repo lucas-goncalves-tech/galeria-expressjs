@@ -15,6 +15,15 @@ export class AlbumController {
     res.status(201).json(newAlbum);
   };
 
+  getAlbumImages = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { sub } = req.user!;
+
+    const images = await this.albumService.getAlbumImages(id, sub);
+
+    res.status(200).send(images);
+  };
+
   findAllByUserId = async (req: Request, res: Response) => {
     const { sub } = req.user!;
 
