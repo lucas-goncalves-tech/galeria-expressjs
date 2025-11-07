@@ -43,7 +43,7 @@ export class ImageRepository {
     }
   }
 
-  async findByalbumId(albumId: string) {
+  async findAllByAlbumId(albumId: string) {
     const sql = `SELECT * FROM images WHERE album_id = @album_id`;
 
     try {

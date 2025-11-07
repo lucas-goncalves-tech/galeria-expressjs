@@ -1,8 +1,7 @@
 import z from 'zod';
 
-export const tokensSchema = z.object({
+export const tokenSchema = z.object({
   access_token: z.string(),
-  refresh_token: z.string(),
 });
 
-export type TokensDTO = z.infer<typeof tokensSchema>;
+export type TokensDTO = z.infer<typeof tokenSchema>;

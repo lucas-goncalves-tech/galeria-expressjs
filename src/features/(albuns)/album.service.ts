@@ -22,13 +22,13 @@ export class AlbumService {
   async getAlbumImages(albumId: string, userId: string) {
     const existAlbum = await this.albumRepository.findById(albumId);
     if (!existAlbum) {
-      throw new NotFoundError('Album não encontrado!');
+      throw new NotFoundError();
     }
     if (existAlbum.visibility === 'PRIVATE' && existAlbum.user_id !== userId) {
-      throw new ForbiddenError('Vocẽ não tem acesso a esse album!');
+      throw new ForbiddenError();
     }
     const baseUrl = process.env.API_BASE_URL!;
-    const images = await this.imageRepository.findByalbumId(existAlbum.id);
+    const images = await this.imageRepository.findAllByAlbumId(existAlbum.id);
     return images.map((img) => {
       const thumbnailUrl = img.thumbnail_key
         ? `${baseUrl}/image/${img.thumbnail_key}`
@@ -61,10 +61,10 @@ export class AlbumService {
   async findById(albumId: string, userId: string) {
     const album = await this.albumRepository.findById(albumId);
     if (!album) {
-      throw new NotFoundError('Album não encontrado!');
+      throw new NotFoundError();
     }
-    if (album.visibility !== 'PUBLIC' && album.user_id !== userId) {
-      throw new ForbiddenError('Vocẽ não tem acesso a esse album!');
+    if (album.visibility === 'PRIVATE' && album.user_id !== userId) {
+      throw new ForbiddenError();
     }
     const { user_id, ...albumWithoutUserId } = album;
     return albumWithoutUserId;
@@ -77,10 +77,10 @@ export class AlbumService {
   ) {
     const albumExist = await this.albumRepository.findById(albumId);
     if (!albumExist) {
-      throw new NotFoundError('Album não encontrado!');
+      throw new NotFoundError();
     }
     if (albumExist.user_id !== userId) {
-      throw new ForbiddenError('Voce não tem acceso a esse album!');
+      throw new ForbiddenError();
     }
 
     const { user_id, ...safeAlbum } = await this.albumRepository.update(
@@ -94,11 +94,11 @@ export class AlbumService {
   async delete(albumId: string, userId: string) {
     const albumExist = await this.albumRepository.findById(albumId);
     if (!albumExist) {
-      throw new NotFoundError('Album não encontrado!');
+      throw new NotFoundError();
     }
 
     if (albumExist.user_id !== userId) {
-      throw new ForbiddenError('Você não tem acesso a esse album!');
+      throw new ForbiddenError();
     }
 
     const isAlbumDeleted = await this.albumRepository.delete(albumId, userId);

@@ -17,17 +17,9 @@ export class AuthController {
   login = async (req: Request, res: Response) => {
     const credentials: LoginDTO = req.body;
 
-    const tokens = await this.authService.login(credentials);
+    const token = await this.authService.login(credentials);
 
-    res
-      .status(200)
-      .cookie('refresh_token', tokens.refresh_token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      })
-      .json({ access_token: tokens.access_token });
+    res.status(200).json({ access_token: token.access_token });
   };
 
   me = async (req: Request, res: Response) => {

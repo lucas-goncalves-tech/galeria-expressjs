@@ -13,12 +13,9 @@ export class AuthService {
   private readonly SALT_ROUNDS = Number(process.env.SALT_ROUNDS);
   private readonly JWT_SECRET = process.env.JWT_SECRET;
   private readonly JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN;
-  private readonly REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
-  private readonly REFRESH_TOKEN_EXPIRES_IN =
-    process.env.REFRESH_TOKEN_EXPIRES_IN;
   constructor(private readonly userRepository: UserRepository) {
     if (!this.SALT_ROUNDS || isNaN(this.SALT_ROUNDS)) {
-      throw new Error('SALT_ROUNDS não está definido ou é inválido');
+      throw new Error('SALT_ROUNDS não está definido');
     }
     if (!this.JWT_SECRET) {
       throw new Error('JWT_SECRET não está definido');
@@ -26,18 +23,12 @@ export class AuthService {
     if (!this.JWT_EXPIRES_IN) {
       throw new Error('JWT_EXPIRES_IN não está definido');
     }
-    if (!this.REFRESH_TOKEN_SECRET) {
-      throw new Error('REFRESH_TOKEN_SECRET não está definido');
-    }
-    if (!this.REFRESH_TOKEN_EXPIRES_IN) {
-      throw new Error('REFRESH_TOKEN_EXPIRES_IN não está definido');
-    }
   }
 
   async register(credentials: RegisterDTO) {
     const userExists = await this.userRepository.findByEmail(credentials.email);
     if (userExists) {
-      throw new ConflictError('Email já cadastrado');
+      throw new ConflictError('Email já cadastrado!');
     }
 
     const hashedPassword = await bcrypt.hash(
@@ -74,16 +65,7 @@ export class AuthService {
       },
     );
 
-    const refresh_token = jwt.sign(
-      { sub: userExists.id },
-      this.REFRESH_TOKEN_SECRET!,
-      {
-        expiresIn: this
-          .REFRESH_TOKEN_EXPIRES_IN as jwt.SignOptions['expiresIn'],
-      },
-    );
-
-    return { access_token, refresh_token };
+    return { access_token };
   }
 
   async me(userId: string) {

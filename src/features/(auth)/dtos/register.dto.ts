@@ -7,10 +7,14 @@ export const registerSchema = z
       .min(3, 'O nome de usuário deve ter pelo menos 3 caracteres')
       .max(30, 'O nome de usuário deve ter no máximo 30 caracteres'),
     email: z.email('Email inválido'),
-    password: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres'),
+    password: z
+      .string()
+      .min(6, 'A senha deve ter pelo menos 6 caracteres')
+      .max(20, 'A Senha deve ter no máximo 20 caracteres!'),
     confirmPassword: z
       .string()
-      .min(6, 'A confirmação de senha deve ter pelo menos 6 caracteres'),
+      .min(6, 'A confirmação de senha deve ter pelo menos 6 caracteres')
+      .max(20, 'A Senha deve ter no máximo 20 caracteres!'),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'As senhas não coincidem',

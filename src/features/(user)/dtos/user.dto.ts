@@ -4,8 +4,8 @@ export const userWithHashSchema = z.object({
   id: z.string(),
   name: z
     .string()
-    .min(3, 'Username precisa ter no minimo 3 caracteres')
-    .max(30, 'Username pode ter no maximo 30 caracteres'),
+    .min(3, 'Nome precisa ter no minimo 3 caracteres')
+    .max(30, 'Nome pode ter no maximo 30 caracteres'),
   email: z.email(),
   password_hash: z.string(),
   role: z.enum(['user', 'admin']).default('user'),

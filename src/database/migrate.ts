@@ -2,12 +2,6 @@ import { db } from './connection';
 import fs from 'node:fs';
 import path from 'node:path';
 
-interface IMigration {
-  id: number;
-  name: string;
-  run_on: string;
-}
-
 function runMigrations() {
   const migrationDir = path.resolve(__dirname, 'migrations');
   const migrationFiles = fs.readdirSync(migrationDir).sort();
@@ -20,7 +14,7 @@ function runMigrations() {
       run_on TEXT DEFAULT CURRENT_TIMESTAMP
     ) STRICT;
     `);
-  console.log('Starting database migrations...');
+  console.log('Iniciando migrations no banco de dados...');
   try {
     migrationFiles.forEach((file) => {
       const allrunMigrationsStmt = db.prepare(
@@ -28,7 +22,7 @@ function runMigrations() {
       );
       const alreadyRun = allrunMigrationsStmt.get(file);
       if (alreadyRun) {
-        console.log(`Skipping already executed migration: ${file}`);
+        console.log(`Pulando migration ja executada: ${file}`);
         return;
       }
 
@@ -39,13 +33,13 @@ function runMigrations() {
         'INSERT INTO migrations (name) VALUES (?)',
       );
       insertMigration.run(file);
-      console.log(`Executed migration: ${file}`);
+      console.log(`Migration executada: ${file}`);
     });
     db.exec('COMMIT;');
-    console.log('Database migrations completed.');
+    console.log('Migration no banco de dados concluida.');
   } catch (error) {
     db.exec('ROLLBACK;');
-    console.log('Error during migrations, rolled back changes.', error);
+    console.log('Erro durante migrations, rollback iniciado.', error);
     process.exit(1);
   }
 }

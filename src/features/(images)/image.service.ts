@@ -23,10 +23,10 @@ export class ImageService {
   ) {
     const existAlbum = await this.albumRepository.findById(albumId);
     if (!existAlbum) {
-      throw new NotFoundError('Album não encontrado!');
+      throw new NotFoundError();
     }
     if (existAlbum.user_id !== userId) {
-      throw new ForbiddenError('Vocẽ não tem acesso a esse album!');
+      throw new ForbiddenError();
     }
 
     const fileExt = path.extname(file.originalname);
@@ -64,15 +64,15 @@ export class ImageService {
   async getDownloadDetails(storage_key: string, userId: string) {
     const existImage = await this.imageRepository.findByStorageKey(storage_key);
     if (!existImage) {
-      throw new NotFoundError('Imagem não encontrada!');
+      throw new NotFoundError();
     }
     const existAlbum = await this.albumRepository.findById(existImage.album_id);
     if (!existAlbum) {
-      throw new NotFoundError('Album não encontrado!');
+      throw new NotFoundError();
     }
 
     if (existAlbum.visibility === 'PRIVATE' && existAlbum.user_id !== userId) {
-      throw new ForbiddenError('Você não tem acesso a esse album!');
+      throw new ForbiddenError();
     }
 
     const storageKeyToServe =
@@ -101,21 +101,21 @@ export class ImageService {
   async delete(storage_key: string, userId: string) {
     const existImage = await this.imageRepository.findByStorageKey(storage_key);
     if (!existImage) {
-      throw new NotFoundError('Imagem não encontrada!');
+      throw new NotFoundError();
     }
     const existAlbum = await this.albumRepository.findById(existImage.album_id);
     if (!existAlbum) {
-      throw new NotFoundError('Album não encontrado!');
+      throw new NotFoundError();
     }
     if (existAlbum.user_id !== userId) {
-      throw new ForbiddenError('Você não tem acesso a esse album!');
+      throw new ForbiddenError();
     }
     try {
-      this.db.prepare('BEGIN TRANSACTION').run();
+      this.db.exec('BEGIN TRANSACTION');
       await this.imageRepository.delete(existImage.id);
 
       if (existAlbum.cover_image_key === storage_key) {
-        const allImages = await this.imageRepository.findByalbumId(
+        const allImages = await this.imageRepository.findAllByAlbumId(
           existAlbum.id,
         );
         const otherImages = allImages.filter((img) => existImage.id !== img.id);
@@ -129,9 +129,9 @@ export class ImageService {
         }
       }
 
-      this.db.prepare('COMMIT').run();
+      this.db.exec('COMMIT');
     } catch (error) {
-      this.db.prepare('ROLLBACK').run();
+      this.db.exec('ROLLBACK');
       console.error('Transaction falhou ao deletar imagem:', error);
       throw error;
     }
@@ -142,7 +142,7 @@ export class ImageService {
         await this.storageProvider.delete(existImage.thumbnail_key);
       }
     } catch (error) {
-      console.error('Falaha ao deletar imagem do sistema: ', error);
+      console.error('Falha ao deletar imagem do sistema: ', error);
       throw error;
     }
   }

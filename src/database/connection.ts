@@ -6,7 +6,7 @@ const DB_URL =
   (process.env.NODE_ENV === 'production' ? '' : 'database.sqlite');
 
 if (!DB_URL) {
-  throw new Error('❌ DATABASE_URL is required in production environment');
+  throw new Error('❌ DATABASE_URL não foi denifida!');
 }
 const DB_PATH = path.resolve(process.cwd(), DB_URL);
 
