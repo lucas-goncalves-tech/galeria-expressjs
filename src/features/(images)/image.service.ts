@@ -75,14 +75,26 @@ export class ImageService {
       throw new ForbiddenError('Você não tem acesso a esse album!');
     }
 
+    const storageKeyToServe =
+      existImage.storage_key === storage_key
+        ? existImage.storage_key
+        : existImage.thumbnail_key;
+    const mimeToServe =
+      existImage.storage_key === storage_key
+        ? existImage.mime_type
+        : 'image/jpeg';
+    const originalNameToServe =
+      existImage.storage_key === storage_key
+        ? existImage.original_name
+        : `thumb-${existImage.original_name}`;
     const filePath = this.storageProvider.getAbsolutePath(
-      existImage.storage_key,
+      storageKeyToServe || existImage.storage_key,
     );
 
     return {
       filePath,
-      mime_type: existImage.mime_type,
-      original_name: existImage.original_name,
+      mime_type: mimeToServe,
+      original_name: originalNameToServe,
     };
   }
 

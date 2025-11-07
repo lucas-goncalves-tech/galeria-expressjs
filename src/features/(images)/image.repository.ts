@@ -23,11 +23,11 @@ export class ImageRepository {
     }
   }
 
-  async findByStorageKey(storage_key: string) {
-    const sql = `SELECT * FROM images WHERE storage_key = @storage_key`;
+  async findByStorageKey(key: string) {
+    const sql = `SELECT * FROM images WHERE storage_key = @key OR thumbnail_key = @key`;
 
     try {
-      const row = this.db.prepare(sql).get({ storage_key });
+      const row = this.db.prepare(sql).get({ key });
 
       const safeImage = imageSchema.safeParse(row);
       if (!safeImage.success) {

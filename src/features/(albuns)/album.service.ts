@@ -8,7 +8,11 @@ export class AlbumService {
   constructor(private readonly albumRepository: AlbumRepository) {}
 
   async create(newAlbumData: CreateAlbumDTO, userId: string) {
-    return await this.albumRepository.create(newAlbumData, userId);
+    const { user_id, ...safeNewAlbum } = await this.albumRepository.create(
+      newAlbumData,
+      userId,
+    );
+    return safeNewAlbum;
   }
 
   async findAllByUserId(userId: string) {
